@@ -7,7 +7,7 @@
   --terracotta: #ad6a50;
   --cream: #f8f7f3;
   --green: #4c785f;
-  font-family: "DM Sans", "Noto Sans SC", sans-serif;
+  font-family: "DM Sans", "Noto Sans TC", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -27,7 +27,7 @@ main { max-width: 1200px; margin: auto; padding: 0 44px; }
 .hero::before { content: ""; position: absolute; inset: 0; opacity: .14; background: radial-gradient(ellipse at 78% 8%, #d4b68f 0, transparent 34%), linear-gradient(112deg, transparent 42%, #8ca0aa 100%); }
 .hero-copy { position: relative; z-index: 2; width: 55%; }
 .eyebrow { color: #c9ad91; font-size: 9px; font-weight: 700; letter-spacing: .22em; margin: 0 0 19px; }
-.hero h1 { font-family: "Noto Sans SC", sans-serif; font-size: clamp(32px, 4vw, 45px); line-height: 1.45; letter-spacing: .045em; margin: 0; font-weight: 600; }
+.hero h1 { font-family: "Noto Sans TC", sans-serif; font-size: clamp(32px, 4vw, 45px); line-height: 1.45; letter-spacing: .045em; margin: 0; font-weight: 600; }
 .hero h1 em { color: #e4c3a8; font-style: normal; }
 .hero-text { color: #d0d9e1; max-width: 370px; font-size: 13px; line-height: 1.9; margin: 15px 0 19px; }
 .hero-meta { display: flex; align-items: center; gap: 9px; color: #bdcbd4; font-size: 11px; letter-spacing: .05em; }
@@ -40,11 +40,11 @@ main { max-width: 1200px; margin: auto; padding: 0 44px; }
 .hill { position: absolute; width: 145%; height: 48%; border-radius: 50% 50% 0 0; bottom: -25%; }
 .hill-back { background: #344d60; left: -12%; transform: rotate(-9deg); }
 .hill-front { background: #263f54; left: 15%; bottom: -35%; transform: rotate(8deg); }
-.art-caption { position: absolute; right: 26px; bottom: 19px; color: #bac7cf; font-family: "Noto Sans SC", sans-serif; font-size: 10px; letter-spacing: .22em; writing-mode: vertical-rl; }
+.art-caption { position: absolute; right: 26px; bottom: 19px; color: #bac7cf; font-family: "Noto Sans TC", sans-serif; font-size: 10px; letter-spacing: .22em; writing-mode: vertical-rl; }
 .workspace { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(270px, .75fr); gap: 84px; padding: 62px 7.5% 75px; }
 .section-kicker { display: flex; align-items: center; gap: 9px; color: #84909a; font-size: 10px; font-weight: 600; letter-spacing: .15em; }
 .section-kicker span { color: var(--terracotta); font-size: 11px; font-weight: 700; }
-h2 { color: var(--navy); font-family: "Noto Sans SC", sans-serif; font-weight: 600; font-size: 23px; letter-spacing: .035em; margin: 13px 0 8px; }
+h2 { color: var(--navy); font-family: "Noto Sans TC", sans-serif; font-weight: 600; font-size: 23px; letter-spacing: .035em; margin: 13px 0 8px; }
 .section-intro { color: #7b8792; font-size: 12px; line-height: 1.85; margin: 0 0 28px; }
 .field-label { display: flex; justify-content: space-between; align-items: center; color: #3b4a5a; font-size: 11px; font-weight: 600; margin: 0 0 10px; }
 .field-label span { color: #b37a64; font-size: 10px; font-weight: 400; }
@@ -55,7 +55,7 @@ input[type="text"] { width: 100%; border: 0; outline: 0; color: var(--ink); back
 input::placeholder, textarea::placeholder { color: #aeb6bd; }
 .field-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 23px; }
 .field-hint { color: #a0a9b0; font-size: 10px; }
-textarea { width: 100%; resize: vertical; min-height: 175px; border: 1px solid #dfe4e9; border-radius: 3px; padding: 13px 14px; color: var(--ink); background: #fff; outline: 0; font-family: "Noto Sans SC", sans-serif; font-size: 12px; line-height: 1.85; transition: border-color .15s, box-shadow .15s; }
+textarea { width: 100%; resize: vertical; min-height: 175px; border: 1px solid #dfe4e9; border-radius: 3px; padding: 13px 14px; color: var(--ink); background: #fff; outline: 0; font-family: "Noto Sans TC", sans-serif; font-size: 12px; line-height: 1.85; transition: border-color .15s, box-shadow .15s; }
 .lyrics-note { display: flex; gap: 9px; padding: 11px 12px; margin: 10px 0 18px; background: #f8f7f4; color: #818b93; }
 .lyrics-note p { margin: 0; font-size: 10px; line-height: 1.75; }
 .note-icon { flex: 0 0 15px; display: grid; place-items: center; width: 15px; height: 15px; border: 1px solid #aa927d; border-radius: 50%; color: #997d67; font-family: serif; font-size: 10px; font-style: italic; }
@@ -72,12 +72,12 @@ textarea { width: 100%; resize: vertical; min-height: 175px; border: 1px solid #
 .guide-column { padding-top: 35px; }
 .guide-card { background: var(--cream); padding: 29px 27px 0; }
 .guide-label { color: var(--terracotta); font-size: 9px; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; }
-.guide-card h3 { color: var(--navy); font-family: "Noto Sans SC", sans-serif; font-size: 19px; line-height: 1.7; font-weight: 500; margin: 12px 0 18px; }
+.guide-card h3 { color: var(--navy); font-family: "Noto Sans TC", sans-serif; font-size: 19px; line-height: 1.7; font-weight: 500; margin: 12px 0 18px; }
 .guide-divider { width: 30px; height: 2px; background: #c2957d; }
 .module-list { list-style: none; margin: 22px 0 24px; padding: 0; }
-.module-list li { display: grid; grid-template-columns: 32px 1fr; gap: 8px; padding: 12px 0; border-bottom: 1px solid #e9e6e0; color: #455566; font-family: "Noto Sans SC", sans-serif; font-size: 11px; font-weight: 500; }
+.module-list li { display: grid; grid-template-columns: 32px 1fr; gap: 8px; padding: 12px 0; border-bottom: 1px solid #e9e6e0; color: #455566; font-family: "Noto Sans TC", sans-serif; font-size: 11px; font-weight: 500; }
 .module-list li > span { color: #b4836b; font-family: "DM Sans", sans-serif; font-size: 10px; }
-.module-list small { display: block; color: #959d9f; font-family: "Noto Sans SC", sans-serif; font-size: 9px; font-weight: 400; margin-top: 5px; }
+.module-list small { display: block; color: #959d9f; font-family: "Noto Sans TC", sans-serif; font-size: 9px; font-weight: 400; margin-top: 5px; }
 .guide-footer { margin: 0 -27px; padding: 14px 27px; background: #eeece7; color: #7e898e; font-size: 9px; }
 .guide-footer span { color: #5b6f7c; font-weight: 700; letter-spacing: .08em; margin-right: 7px; }
 .privacy-note { color: #9aa2a6; display: flex; gap: 8px; font-size: 9px; line-height: 1.7; margin: 13px 0 0; }
@@ -87,16 +87,16 @@ textarea { width: 100%; resize: vertical; min-height: 175px; border: 1px solid #
 .lyrics-review { display: grid; gap: 12px; margin: 20px 0; }
 .lyrics-stanza { background: #f8f7f3; border-left: 2px solid #b9856c; padding: 13px 17px; }
 .lyrics-stanza h4 { color: #9e6d58; font-size: 11px; margin: 0 0 8px; }
-.lyrics-stanza p { white-space: pre-wrap; color: #445260; font-family: "Noto Sans SC", sans-serif; font-size: 12px; line-height: 1.9; margin: 0; }
-.confirm-row { display: flex; align-items: flex-start; gap: 9px; color: #536372; font-family: "Noto Sans SC", sans-serif; font-size: 11px; line-height: 1.7; cursor: pointer; }
+.lyrics-stanza p { white-space: pre-wrap; color: #445260; font-family: "Noto Sans TC", sans-serif; font-size: 12px; line-height: 1.9; margin: 0; }
+.confirm-row { display: flex; align-items: flex-start; gap: 9px; color: #536372; font-family: "Noto Sans TC", sans-serif; font-size: 11px; line-height: 1.7; cursor: pointer; }
 .confirm-row input { accent-color: var(--navy); margin: 2px 0 0; }
 .outline-review { margin: 22px 0 15px; }
 .outline-stanza { padding: 17px 0; border-top: 1px solid var(--line); }
-.outline-stanza h3 { margin: 0 0 8px; color: var(--navy); font-family: "Noto Sans SC", sans-serif; font-size: 14px; }
+.outline-stanza h3 { margin: 0 0 8px; color: var(--navy); font-family: "Noto Sans TC", sans-serif; font-size: 14px; }
 .outline-stanza p { color: #74808c; font-size: 11px; line-height: 1.8; margin: 5px 0; }
 .outline-stanza strong { color: #536372; font-weight: 600; }
 .outline-label { display: block; color: #657382; font-size: 10px; margin: 12px 0 7px; }
-.outline-title, .outline-phrase { width: 100%; min-height: 38px; padding: 8px 10px; border: 1px solid #dfe4e9; border-radius: 3px; color: #35485b; font-family: "Noto Sans SC", sans-serif; font-size: 11px; }
+.outline-title, .outline-phrase { width: 100%; min-height: 38px; padding: 8px 10px; border: 1px solid #dfe4e9; border-radius: 3px; color: #35485b; font-family: "Noto Sans TC", sans-serif; font-size: 11px; }
 .outline-title:focus, .outline-phrase:focus { border-color: #8799aa; outline: 2px solid #e9eef2; }
 .phrase-editor { display: grid; gap: 8px; }
 .phrase-edit-row { display: flex; align-items: center; gap: 8px; }
@@ -115,17 +115,19 @@ textarea { width: 100%; resize: vertical; min-height: 175px; border: 1px solid #
 .download-icon { font-size: 16px; }
 .report-content { display: grid; gap: 14px; }
 .report-card { border: 1px solid #e6e4df; background: #fff; padding: 20px 22px; }
-.report-card h3 { color: var(--navy); font-family: "Noto Sans SC", sans-serif; font-size: 14px; margin: 0 0 12px; }
-.report-card h4 { color: #9e5946; font-family: "Noto Sans SC", sans-serif; font-size: 12px; margin: 16px 0 7px; }
-.report-card p, .report-card li { color: #596671; font-family: "Noto Sans SC", sans-serif; font-size: 11px; line-height: 1.9; }
+.report-card h3 { color: var(--navy); font-family: "Noto Sans TC", sans-serif; font-size: 14px; margin: 0 0 12px; }
+.report-card h4 { color: #9e5946; font-family: "Noto Sans TC", sans-serif; font-size: 12px; margin: 16px 0 7px; }
+.report-card h5 { color: #2e6b45; font-family: "Noto Sans TC", sans-serif; font-size: 11px; margin: 14px 0 4px; }
+.report-card strong { color: var(--navy); font-weight: 600; }
+.report-card p, .report-card li { color: #596671; font-family: "Noto Sans TC", sans-serif; font-size: 11px; line-height: 1.9; }
 .report-card p { margin: 5px 0; white-space: pre-wrap; }
 .report-card ul, .report-card ol { padding-left: 21px; margin: 7px 0; }
 .report-card table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-.report-card th, .report-card td { border: 1px solid #e5e8eb; text-align: left; padding: 9px; font-family: "Noto Sans SC", sans-serif; font-size: 10px; line-height: 1.7; vertical-align: top; }
+.report-card th, .report-card td { border: 1px solid #e5e8eb; text-align: left; padding: 9px; font-family: "Noto Sans TC", sans-serif; font-size: 10px; line-height: 1.7; vertical-align: top; }
 .report-card th { color: #fff; background: #1a365d; font-weight: 500; }
 .report-card tr:nth-child(even) td { background: #f4f8fb; }
 .phrase-card { margin: 9px 0; padding: 12px 14px; background: #f8fafb; border-left: 2px solid #526f8e; }
-.phrase-card .verse { color: #62778b; font-size: 10px; }
+.phrase-card .verse { color: #4f6378; }
 .colored-card { background: #fff7f7; border-color: #f0d6da; }
 .group-card { background: #f3faf5; border-color: #d6e8dc; }
 .prayer-card { background: #fffdf0; border-color: #eadfa8; }
@@ -134,7 +136,7 @@ textarea { width: 100%; resize: vertical; min-height: 175px; border: 1px solid #
 .loading-overlay { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: rgba(16, 34, 52, .43); backdrop-filter: blur(3px); }
 .loading-overlay[hidden], [hidden] { display: none !important; }
 .loading-card { width: min(340px, calc(100vw - 34px)); padding: 30px; background: #fff; text-align: center; box-shadow: 0 18px 60px #172e4635; }
-.loading-card h3 { color: var(--navy); font-family: "Noto Sans SC", sans-serif; font-size: 15px; margin: 15px 0 6px; }
+.loading-card h3 { color: var(--navy); font-family: "Noto Sans TC", sans-serif; font-size: 15px; margin: 15px 0 6px; }
 .loading-card p { color: #87919a; font-size: 11px; line-height: 1.7; margin: 0; }
 .loader { width: 32px; height: 32px; border: 2px solid #e7eaeb; border-top-color: #b17b62; border-radius: 50%; margin: auto; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }

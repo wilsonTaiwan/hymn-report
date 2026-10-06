@@ -3,66 +3,9 @@ const http = require("node:http");
 const { once } = require("node:events");
 const test = require("node:test");
 
-const lyrics = "我仰望十字架，主爱永长存。";
-const outline = {
-  title_zh: "仰望十字架",
-  title_en: "",
-  hymnal: "生命诗歌 200 首",
-  author_line: "作者不详，资料待核",
-  stanzas: [{
-    no: "第一节",
-    title: "仰望并领受救恩",
-    phrases: ["我仰望十字架", "主爱永长存。"],
-  }],
-};
+const { lyrics: stanzaLyrics, outline, makeReport } = require("./support/fixtures");
 
-function makeReport() {
-  return {
-    title_zh: "仰望十字架",
-    title_en: "",
-    hymnal: "生命诗歌 200 首",
-    author_line: "作者不详，资料待核",
-    lyrics: [{ no: "一", text: lyrics }],
-    author_bio: ["作者资料待核；请使用前核实诗集与可靠来源。"],
-    author_works: "资料待核",
-    background: ["创作背景资料待核。"],
-    music: {
-      intro: "本诗引导读者仰望十字架，并思想主的爱。",
-      guidance: [{ stanza: "第一节", text: "以安静敬拜的情绪唱诵。" }],
-    },
-    structure_table: [{
-      stanza: "第一节",
-      experience: "仰望并领受救恩",
-      verses: "来 12:2；罗 5:8",
-    }],
-    stanzas: [{
-      no: "第一节",
-      title: "仰望并领受救恩",
-      phrases: [
-        { phrase: "我仰望十字架", explanation: "思想诗句所指向的救恩。", verses: "来 12:2；罗 5:8" },
-        { phrase: "主爱永长存。", explanation: "思想主爱的长久与信实。", verses: "约 3:16；罗 8:38-39" },
-      ],
-      revelation: [
-        { text: "从救赎真理认识主的工作。", source: "精神归纳自相关属灵信息" },
-        { text: "从日常经历学习信靠主。", source: "精神归纳自相关属灵信息" },
-        { text: "让福音成为生活见证。", source: "精神归纳自相关属灵信息" },
-      ],
-      group: {
-        questions: [
-          { q: "这节诗歌指向什么？", hint: "留意诗句中的十字架意象。" },
-          { q: "如何在生活中回应？", hint: "分享一个具体可行的行动。" },
-        ],
-        practice: "本周每日默想一处相关经文。",
-        prayer: "求主帮助我们真实经历你的爱。阿们。",
-      },
-    }],
-    summary_table: {
-      headers: ["诗歌主题", "T. A. Sparks", "倪柝声", "李常受"],
-      rows: [["仰望十字架", "思想救赎", "经历恩典", "活出新生"]],
-    },
-    closing_prayer: ["求主带领我们遵行所领受的亮光。阿们。"],
-  };
-}
+const lyrics = stanzaLyrics.join("\n\n");
 
 test("generates an approved outline, complete report, and downloadable DOCX", async () => {
   const report = makeReport();
@@ -91,7 +34,7 @@ test("generates an approved outline, complete report, and downloadable DOCX", as
     assert.equal(home.status, 200);
     assert.match(await home.text(), /hymn-lyrics/);
 
-    const input = { title: "生命诗歌 200 首", lyrics };
+    const input = { title: "生命詩歌 200 首", lyrics };
     const outlineResponse = await fetch(`${baseUrl}/api/outline`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -108,7 +51,7 @@ test("generates an approved outline, complete report, and downloadable DOCX", as
     assert.equal(unconfirmed.status, 400);
 
     const alteredOutline = structuredClone(outline);
-    alteredOutline.stanzas[0].phrases[0] = "没有出现在歌词里的句子";
+    alteredOutline.stanzas[0].phrases[0] = "沒有出現在歌詞裡的句子";
     const invalidOutline = await fetch(`${baseUrl}/api/generate`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -123,8 +66,8 @@ test("generates an approved outline, complete report, and downloadable DOCX", as
     });
     assert.equal(generated.status, 200);
     const result = await generated.json();
-    assert.deepEqual(result.report.lyrics, [{ no: "一", text: lyrics }]);
-    assert.equal(result.report.labels.closingPrayer, "总结回应祷告");
+    assert.deepEqual(result.report.lyrics, stanzaLyrics.map((text, index) => ({ no: ["一", "二"][index], text })));
+    assert.equal(result.report.stanzas[0].revelation[0].author, "史百克 T. A. Sparks");
 
     const download = await fetch(`${baseUrl}/api/download`, {
       method: "POST",
