@@ -11,7 +11,7 @@ const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-20250514";
 const API_URL = process.env.ANTHROPIC_API_URL || "https://api.anthropic.com/v1/messages";
 const MAX_LYRICS = 30000;
 const LIMIT_WINDOW_MS = 60_000;
-const LIMIT_REQUESTS = 12;
+const LIMIT_REQUESTS = Number(process.env.RATE_LIMIT_MAX || 12);
 
 const SYSTEM_PROMPT = `你是生命诗歌属灵意涵教材的编辑。严格遵守用户提供的歌词，不修订、不补写、不改字。使用简体中文撰写内容，输出只能是符合要求结构的 JSON，不要 Markdown。
 
