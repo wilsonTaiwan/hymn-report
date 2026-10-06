@@ -71,7 +71,7 @@ test("generates an approved outline, complete report, and downloadable DOCX", as
     const chunks = [];
     for await (const chunk of request) chunks.push(chunk);
     const payload = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-    assert.equal(payload.model, "claude-sonnet-4-20250514");
+    assert.equal(payload.model, "claude-sonnet-5-5");
     completionCount += 1;
     const result = completionCount === 1 ? outline : report;
     response.writeHead(200, { "content-type": "application/json" });
