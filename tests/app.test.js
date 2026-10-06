@@ -28,7 +28,7 @@ function makeReport() {
     background: ["创作背景资料待核。"],
     music: {
       intro: "本诗引导读者仰望十字架，并思想主的爱。",
-      guidance: [{ stanza: "第一节", text: "以安静敬拜的情绪唱诵。" }],
+      guidance: [{ stanza: "第一节", mood: "安靜敬拜", tempo: "中速（♩ = 72–76）", dynamics: "p 至 mp", text: "以安静敬拜的情绪唱诵。" }],
     },
     structure_table: [{
       stanza: "第一节",
@@ -39,8 +39,8 @@ function makeReport() {
       no: "第一节",
       title: "仰望并领受救恩",
       phrases: [
-        { phrase: "我仰望十字架", explanation: "思想诗句所指向的救恩。", verses: "来 12:2；罗 5:8" },
-        { phrase: "主爱永长存。", explanation: "思想主爱的长久与信实。", verses: "约 3:16；罗 8:38-39" },
+        { phrase: "我仰望十字架", explanation: "思想诗句所指向的救恩。", truth: { ref: "来 12:2", text: "" }, life: { ref: "罗 5:8", text: "" } },
+        { phrase: "主爱永长存。", explanation: "思想主爱的长久与信实。", truth: { ref: "约 3:16", text: "" }, life: { ref: "罗 8:38-39", text: "" } },
       ],
       revelation: [
         { text: "从救赎真理认识主的工作。", source: "精神歸納自相關屬靈信息" },
@@ -49,10 +49,10 @@ function makeReport() {
       ],
       group: {
         questions: [
-          { q: "这节诗歌指向什么？", hint: "留意诗句中的十字架意象。" },
-          { q: "如何在生活中回应？", hint: "分享一个具体可行的行动。" },
+          { q: "这节诗歌指向什么？", answer: "留意诗句中的十字架意象。" },
+          { q: "如何在生活中回应？", answer: "分享一个具体可行的行动。" },
         ],
-        practice: "本周每日默想一处相关经文。",
+        practice: { item: "默想经文", steps: "本周每日默想一处相关经文。" },
         prayer: "求主帮助我们真实经历你的爱。阿们。",
       },
     }],
@@ -91,7 +91,7 @@ test("generates an approved outline, complete report, and downloadable DOCX", as
     assert.equal(home.status, 200);
     assert.match(await home.text(), /hymn-lyrics/);
 
-    const input = { title: "生命诗歌 200 首", lyrics };
+    const input = { title: "生命诗歌 200 首", lyrics: `第一节\n${lyrics}` };
     const outlineResponse = await fetch(`${baseUrl}/api/outline`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -130,7 +130,8 @@ test("generates an approved outline, complete report, and downloadable DOCX", as
     assert.equal(result.report.author_bio[0], "作者資料待核；請使用前核實詩集與可靠來源。");
     assert.equal(result.report.stanzas[0].phrases[1].phrase, "主爱永长存。");
     assert.equal(result.report.stanzas[0].phrases[1].explanation, "思想主愛的長久與信實。");
-    assert.equal(result.report.labels.closingPrayer, "總結回應禱告");
+    assert.equal(result.report.labels.closingPrayer, "十、總結回應禱告");
+    assert.deepEqual(result.report.summary_table.headers, ["詩歌主題", "T. A. Sparks（客觀真理）", "倪柝聲（主觀經歷）", "李常受（生命解讀）"]);
 
     const download = await fetch(`${baseUrl}/api/download`, {
       method: "POST",
@@ -148,4 +149,13 @@ test("generates an approved outline, complete report, and downloadable DOCX", as
       new Promise((resolve, reject) => mockClaude.close((error) => error ? reject(error) : resolve())),
     ]);
   }
+});
+
+test("strips stanza heading lines and requires every lyric line to be covered", () => {
+  const { splitLyrics, validateOutline, validateOutlineLyrics } = require("../server");
+  assert.deepEqual(splitLyrics("第一節\n甲行，\n乙行。\n\n二、\n丙行。"), ["甲行，\n乙行。", "丙行。"]);
+  const outlineFor = (phrases) => ({ stanzas: [{ no: "第一節", title: "主題", phrases }] });
+  assert.doesNotThrow(() => validateOutlineLyrics(outlineFor(["甲行", "乙行。"]), ["甲行，\n乙行。"]));
+  assert.throws(() => validateOutlineLyrics(outlineFor(["甲行"]), ["甲行，\n乙行。"]), /未被片語涵蓋/);
+  assert.doesNotThrow(() => validateOutline(outlineFor(["甲行"]), 1));
 });

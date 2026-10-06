@@ -20,6 +20,7 @@ let activeOutline = null;
 let activeLyrics = [];
 let activeReport = null;
 let approvedTitle = "";
+const MAX_PHRASES = 16;
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -76,7 +77,7 @@ function renderOutline(outline) {
     });
     card.append(titleLabel, titleField);
 
-    const phrasesLabel = element("div", "outline-label phrase-label", "原文片語（2–4 組，必須逐字摘自本節歌詞）");
+    const phrasesLabel = element("div", "outline-label phrase-label", `原文片語（每一行歌詞都需涵蓋，最多 ${MAX_PHRASES} 組，必須逐字摘自本節歌詞）`);
     card.append(phrasesLabel);
     const phraseList = element("div", "phrase-editor");
     const renderPhrases = () => {
@@ -93,7 +94,7 @@ function renderOutline(outline) {
           updateGenerateButton();
         });
         row.append(field);
-        if (activeOutline.stanzas[stanzaIndex].phrases.length > 2) {
+        if (activeOutline.stanzas[stanzaIndex].phrases.length > 1) {
           const remove = element("button", "phrase-remove", "移除");
           remove.type = "button";
           remove.setAttribute("aria-label", `移除第 ${phraseIndex + 1} 個片語`);
@@ -106,7 +107,7 @@ function renderOutline(outline) {
         }
         phraseList.append(row);
       });
-      if (activeOutline.stanzas[stanzaIndex].phrases.length < 4) {
+      if (activeOutline.stanzas[stanzaIndex].phrases.length < MAX_PHRASES) {
         const add = element("button", "phrase-add", "+ 添加片語");
         add.type = "button";
         add.addEventListener("click", () => {
@@ -125,11 +126,17 @@ function renderOutline(outline) {
   confirmOutlineRow.hidden = false;
 }
 
+function uncoveredLines(stanzaText, phrases) {
+  return stanzaText.split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
+    .filter((line) => !phrases.some((phrase) => phrase && (line.includes(phrase) || phrase.includes(line))));
+}
+
 function outlineIsValid() {
   if (!activeOutline || activeOutline.stanzas.length !== activeLyrics.length) return false;
   return activeOutline.stanzas.every((stanza, index) =>
-    stanza.title.trim() && stanza.phrases.length >= 2 && stanza.phrases.length <= 4 &&
-    stanza.phrases.every((phrase) => phrase.trim() && activeLyrics[index].includes(phrase)));
+    stanza.title.trim() && stanza.phrases.length >= 1 && stanza.phrases.length <= MAX_PHRASES &&
+    stanza.phrases.every((phrase) => phrase.trim() && activeLyrics[index].includes(phrase)) &&
+    uncoveredLines(activeLyrics[index], stanza.phrases).length === 0);
 }
 
 function addCard(parent, title, className = "report-card") {
@@ -160,69 +167,86 @@ function addTable(parent, headers, rows) {
   parent.append(table);
 }
 
+function verseText(label, verse) {
+  if (!verse) return "";
+  return `${label}${verse.text ? `「${verse.text}」（${verse.ref}）` : verse.ref}`;
+}
+
 function renderReport(report) {
   document.querySelector("#report-title").textContent = report.title_zh;
-  document.querySelector("#report-subtitle").textContent = [report.author_line, report.hymnal].filter(Boolean).join(" · ");
+  document.querySelector("#report-subtitle").textContent =
+    [report.title_en, report.author_line, report.hymnal, report.hymnal_refs].filter(Boolean).join(" · ");
   const content = document.querySelector("#report-content");
   content.replaceChildren();
 
-  const lyricsCard = addCard(content, "詩歌歌詞");
+  const lyricsCard = addCard(content, "一、詩歌歌詞");
   report.lyrics.forEach((stanza) => {
     const article = element("div", "lyrics-stanza");
-    article.append(element("h4", "", `${stanza.no}、`));
+    article.append(element("h4", "", `第${stanza.no}節`));
     article.append(element("p", "", stanza.text));
     lyricsCard.append(article);
   });
 
-  const authorCard = addCard(content, `作者簡介：${report.author_line || "資料待核"}`);
+  const authorCard = addCard(content, `二、作者簡介：${report.author_line || "資料待核"}`);
   report.author_bio.forEach((paragraph) => addParagraph(authorCard, paragraph));
   if (report.author_works) addParagraph(authorCard, `代表作：${report.author_works}`);
 
-  const backgroundCard = addCard(content, "創作背景");
+  const backgroundCard = addCard(content, "三、創作背景");
   report.background.forEach((paragraph) => addParagraph(backgroundCard, paragraph));
 
-  const musicCard = addCard(content, "詩歌簡述與樂感導引");
-  addParagraph(musicCard, report.music.intro);
+  const musicCard = addCard(content, "四、詩歌簡述與樂感表達指導");
+  addParagraph(musicCard, `屬靈進程：${report.music.intro}`);
   report.music.guidance.forEach((item) => {
     musicCard.append(element("h4", "", item.stanza));
-    addParagraph(musicCard, item.text);
+    addParagraph(musicCard, `情緒標籤：${item.mood}`);
+    addParagraph(musicCard, `速度：${item.tempo}`);
+    addParagraph(musicCard, `力度：${item.dynamics}`);
+    addParagraph(musicCard, `樂感細節：${item.text}`);
   });
 
-  const structureCard = addCard(content, "詩節結構與屬靈經歷對照");
+  const structureCard = addCard(content, "五、詩節結構與屬靈經歷對照表");
   addTable(structureCard, ["詩節", "屬靈經歷", "核心經文"], report.structure_table.map((item) => [item.stanza, item.experience, item.verses]));
 
-  const exegesisCard = addCard(content, "逐節屬靈解經與應用");
+  const exegesisCard = addCard(content, "六、逐節屬靈解經與應用");
   report.stanzas.forEach((stanza) => {
     exegesisCard.append(element("h4", "", `${stanza.no}：${stanza.title}`));
-    stanza.phrases.forEach((phrase) => {
+    stanza.phrases.forEach((phrase, index) => {
       const phraseCard = element("div", "phrase-card");
-      phraseCard.append(element("h4", "", phrase.phrase));
-      addParagraph(phraseCard, phrase.explanation);
-      addParagraph(phraseCard, `對照經文：${phrase.verses}`, "verse");
+      phraseCard.append(element("h4", "", `${index + 1}.「${phrase.phrase}」`));
+      addParagraph(phraseCard, verseText("真理根基：", phrase.truth), "verse");
+      addParagraph(phraseCard, verseText("生活實踐：", phrase.life), "verse");
+      addParagraph(phraseCard, `屬靈解經：${phrase.explanation}`);
       exegesisCard.append(phraseCard);
     });
+  });
 
-    const revelationCard = addCard(exegesisCard, "啟示的話", "report-card colored-card");
+  const revelationCard = addCard(content, "七、啟示的話", "report-card colored-card");
+  report.stanzas.forEach((stanza) => {
+    revelationCard.append(element("h4", "", stanza.no));
     stanza.revelation.forEach((item) => addParagraph(revelationCard, `• ${item.text}（${item.source}）`));
+  });
 
-    const groupCard = addCard(exegesisCard, `小組追求（${stanza.no}）`, "report-card group-card");
-    groupCard.append(element("h4", "", "討論題目"));
+  const groupSection = addCard(content, "八、小組追求模組", "report-card group-card");
+  report.stanzas.forEach((stanza) => {
+    groupSection.append(element("h4", "", `【${stanza.no}小組追求】`));
+    groupSection.append(element("p", "", "討論題目"));
     const questions = element("ol");
     stanza.group.questions.forEach((item) => {
       const question = element("li");
       question.append(document.createTextNode(item.q));
-      question.append(element("p", "", `參考：${item.hint}`));
+      question.append(element("p", "", `參考答案：${item.answer}`));
       questions.append(question);
     });
-    groupCard.append(questions);
-    addParagraph(groupCard, `應用操練：${stanza.group.practice}`);
-    addParagraph(groupCard, `禱告：${stanza.group.prayer}`);
+    groupSection.append(questions);
+    addParagraph(groupSection, `操練項目：${stanza.group.practice.item}`);
+    addParagraph(groupSection, `落實步驟：${stanza.group.practice.steps}`);
+    addParagraph(groupSection, `禱告：${stanza.group.prayer}`);
   });
 
-  const summaryCard = addCard(content, "屬靈著述家觀點對照總結");
+  const summaryCard = addCard(content, "九、屬靈著述家觀點對照總結表");
   addTable(summaryCard, report.summary_table.headers, report.summary_table.rows);
 
-  const prayerCard = addCard(content, "總結回應禱告", "report-card prayer-card");
+  const prayerCard = addCard(content, "十、總結回應禱告", "report-card prayer-card");
   report.closing_prayer.forEach((paragraph) => addParagraph(prayerCard, paragraph));
 }
 
@@ -230,7 +254,7 @@ function updateGenerateButton() {
   const validOutline = outlineIsValid();
   generateButton.disabled = !confirmLyrics.checked || !confirmOutline.checked || !validOutline;
   if (!validOutline && activeOutline) {
-    showError(reviewError, "請檢查主題，並確保每節包含 2 至 4 個逐字摘自歌詞原文的片語。");
+    showError(reviewError, "請檢查主題，並確保每節的每一行歌詞都被逐字摘自原文的片語涵蓋。");
   } else if (reviewError.textContent.startsWith("請檢查主題")) {
     showError(reviewError, "");
   }
