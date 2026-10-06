@@ -43,9 +43,9 @@ function makeReport() {
         { phrase: "主爱永长存。", explanation: "思想主爱的长久与信实。", verses: "约 3:16；罗 8:38-39" },
       ],
       revelation: [
-        { text: "从救赎真理认识主的工作。", source: "精神归纳自相关属灵信息" },
-        { text: "从日常经历学习信靠主。", source: "精神归纳自相关属灵信息" },
-        { text: "让福音成为生活见证。", source: "精神归纳自相关属灵信息" },
+        { text: "从救赎真理认识主的工作。", source: "精神歸納自相關屬靈信息" },
+        { text: "从日常经历学习信靠主。", source: "精神歸納自相關屬靈信息" },
+        { text: "让福音成为生活见证。", source: "精神歸納自相關屬靈信息" },
       ],
       group: {
         questions: [
@@ -57,7 +57,7 @@ function makeReport() {
       },
     }],
     summary_table: {
-      headers: ["诗歌主题", "T. A. Sparks", "倪柝声", "李常受"],
+      headers: ["詩歌主題", "T. A. Sparks", "倪柝聲", "李常受"],
       rows: [["仰望十字架", "思想救赎", "经历恩典", "活出新生"]],
     },
     closing_prayer: ["求主带领我们遵行所领受的亮光。阿们。"],
@@ -124,7 +124,7 @@ test("generates an approved outline, complete report, and downloadable DOCX", as
     assert.equal(generated.status, 200);
     const result = await generated.json();
     assert.deepEqual(result.report.lyrics, [{ no: "一", text: lyrics }]);
-    assert.equal(result.report.labels.closingPrayer, "总结回应祷告");
+    assert.equal(result.report.labels.closingPrayer, "總結回應禱告");
 
     const download = await fetch(`${baseUrl}/api/download`, {
       method: "POST",
