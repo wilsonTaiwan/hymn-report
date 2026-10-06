@@ -5,7 +5,7 @@ const { lyrics, outline, makeReport, startMockClaude, startApp, close } = requir
 process.env.ANTHROPIC_API_KEY = "test-key";
 process.env.RATE_LIMIT_MAX = "1000";
 
-const input = { title: "生命诗歌 200 首", lyrics: lyrics.join("\n\n") };
+const input = { title: "生命詩歌 200 首", lyrics: lyrics.join("\n\n") };
 let mock;
 let current = () => ({ text: JSON.stringify(outline) });
 let server;
@@ -84,9 +84,18 @@ test("/api/outline rejects outlines that do not match the lyrics", async () => {
   assert.equal((await server.post("/api/outline", input)).status, 400);
 
   const crossStanza = structuredClone(outline);
-  crossStanza.stanzas[0].phrases[0] = "我背负十字架";
+  crossStanza.stanzas[0].phrases[0] = "我揹負十字架";
   current = () => ({ text: JSON.stringify(crossStanza) });
   assert.equal((await server.post("/api/outline", input)).status, 400);
+});
+
+test("/api/outline accepts a phrase that spans a line break within one stanza", async () => {
+  const twoLines = { title: "t", lyrics: "我仰望十字架，\n主愛永長存。\n\n我背負十字架，\n跟隨主腳蹤。" };
+  const spanning = structuredClone(outline);
+  spanning.stanzas[0].phrases = ["我仰望十字架，主愛永長存。", "主愛永長存。"];
+  spanning.stanzas[1].phrases = ["我背負十字架", "跟隨主腳蹤。"];
+  current = () => ({ text: JSON.stringify(spanning) });
+  assert.equal((await server.post("/api/outline", twoLines)).status, 200);
 });
 
 test("/api/generate requires both confirmations", async () => {
@@ -107,20 +116,40 @@ test("/api/generate enforces the approved outline and report rules", async () =>
     return (await server.post("/api/generate", request)).status;
   };
   assert.equal(await run(() => {}), 200);
-  assert.equal(await run((r) => { r.stanzas[0].title = "改动的主题"; }), 400, "title changed");
-  assert.equal(await run((r) => { r.stanzas[0].phrases[0].phrase = "改动"; }), 400, "phrase changed");
+  assert.equal(await run((r) => { r.stanzas[0].title = "改動的主題"; }), 400, "title changed");
+  assert.equal(await run((r) => { r.stanzas[0].phrases[0].phrase = "改動"; }), 400, "phrase changed");
   assert.equal(await run((r) => { r.stanzas.pop(); }), 400, "missing stanza");
   assert.equal(await run((r) => { r.stanzas[0].revelation.pop(); }), 400, "need 3 revelations");
-  assert.equal(await run((r) => { r.stanzas[0].revelation[0].source = "T. A. Sparks《某书》"; }), 400, "fabricated source");
+  assert.equal(await run((r) => { r.stanzas[0].revelation[0].source = "T. A. Sparks《某書》"; }), 400, "fabricated source");
+  assert.equal(await run((r) => { r.stanzas[0].revelation[0].text = "見《某書》第三章"; }), 400, "book title in revelation");
   assert.equal(await run((r) => { r.stanzas[0].group.questions.pop(); }), 400, "need 2 questions");
-  assert.equal(await run((r) => { r.summary_table.headers[1] = "别人"; }), 400, "wrong author columns");
+  assert.equal(await run((r) => { delete r.stanzas[0].group.questions[0].answer; }), 400, "question needs answer");
+  assert.equal(await run((r) => { r.stanzas[0].group.practice = "一句話"; }), 400, "practice needs item+steps");
+  assert.equal(await run((r) => { r.stanzas[0].group.prayer = "求主帶領我。"; }), 400, "prayer must end with amen");
+  assert.equal(await run((r) => { delete r.stanzas[0].phrases[0].foundation; }), 400, "foundation verse required");
+  assert.equal(await run((r) => { r.stanzas[0].phrases[0].application.ref = ""; }), 400, "application ref required");
+  assert.equal(await run((r) => { delete r.music.guidance[0].mood; }), 400, "mood label required");
+  assert.equal(await run((r) => { r.music.progress.pop(); }), 400, "progress per stanza");
   assert.equal(await run((r) => { r.summary_table.rows.pop(); }), 400, "summary rows");
   assert.equal(await run((r) => { r.closing_prayer = []; }), 400, "empty closing prayer");
 });
 
+test("/api/generate fixes the author labels and summary headers itself", async () => {
+  const report = makeReport();
+  report.summary_table.headers = ["a", "b", "c", "d"];
+  report.stanzas[0].revelation[0].source = "精神歸納自史百克的相關信息";
+  current = () => ({ text: JSON.stringify(report) });
+  const response = await server.post("/api/generate", { ...input, outline, gate1Confirmed: true, gate2Confirmed: true });
+  assert.equal(response.status, 200);
+  const result = (await response.json()).report;
+  assert.deepEqual(result.summary_table.headers, ["詩歌主題", "T. A. Sparks（客觀真理）", "倪柝聲（主觀經歷）", "李常受（生命解讀）"]);
+  assert.deepEqual(result.stanzas[0].revelation.map((r) => r.angle), ["客觀真理", "主觀經歷", "生命解讀"]);
+  assert.equal(result.stanzas[1].revelation[2].author, "李常受");
+});
+
 test("/api/generate overrides lyrics returned by the model with the confirmed text", async () => {
   const report = makeReport();
-  report.lyrics[0].text = "模型擅自改写的歌词";
+  report.lyrics[0].text = "模型擅自改寫的歌詞";
   current = () => ({ text: JSON.stringify(report) });
   const response = await server.post("/api/generate", { ...input, outline, gate1Confirmed: true, gate2Confirmed: true });
   assert.equal(response.status, 200);

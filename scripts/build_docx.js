@@ -55,26 +55,33 @@ const data = JSON.parse(fs.readFileSync(args[0], "utf8"));
 
 // 單位名稱：多節詩歌用「詩節／逐節」，單節經文詩歌可改為「層次／逐句」
 const L = Object.assign({
-  unitCol: "詩節",
-  structureH: "詩節結構與屬靈經歷對照",
-  exegesisH: "逐節屬靈解經與應用",
   lyrics: "詩歌歌詞",
   author: "作者簡介",
   works: "代表作：",
   background: "創作背景",
-  music: "詩歌簡述與樂感導引",
-  musicIntro: "詩歌背景：",
-  musicGuidance: "樂感表達指導：",
+  music: "詩歌簡述與樂感表達指導",
+  musicBackground: "（一）詩歌背景與屬靈進程",
+  musicGuidance: "（二）逐節樂感表達指導",
+  mood: "情緒標籤：",
+  tempo: "速度與力度：",
+  detail: "樂感細節：",
+  structureH: "詩節結構與屬靈經歷對照表",
+  unitCol: "詩節",
   experienceCol: "屬靈經歷",
   versesCol: "核心經文",
-  explanation: "屬靈解釋：",
-  crossReferences: "對照經文：",
-  revelation: "啟示的話：",
-  group: "小組追求",
-  questions: "討論題目：",
-  practice: "應用操練：",
-  prayer: "禱告：",
-  summary: "屬靈著述家觀點對照總結",
+  exegesisH: "逐節屬靈解經與應用",
+  foundation: "真理根基：",
+  application: "生活實踐：",
+  explanation: "屬靈解經：",
+  revelationH: "啟示的話",
+  groupH: "小組追求模組",
+  questions: "討論題目",
+  answer: "參考答案：",
+  practiceH: "本週應用操練",
+  practiceItem: "操練項目：",
+  practiceSteps: "落實步驟：",
+  prayerH: "第一人稱奉主名禱告",
+  summary: "屬靈著述家觀點對照總結表",
   closingPrayer: "總結回應禱告",
 }, data.labels || {});
 
@@ -110,6 +117,7 @@ const noBorders = {
 
 // 章節標題：暗紅左側色條 ＋ 深藍粗體
 const SectionH = (text) => new Paragraph({
+  keepNext: true,
   spacing: { before: 300, after: 150 },
   indent: { left: 160 },
   border: { left: { style: BorderStyle.SINGLE, size: 20, space: 10, color: C.crimson } },
@@ -118,6 +126,7 @@ const SectionH = (text) => new Paragraph({
 
 // 詩節標題：暗紅粗體 ＋ 下方細線
 const StanzaH = (text) => new Paragraph({
+  keepNext: true,
   spacing: { before: 300, after: 150 },
   border: { bottom: { style: BorderStyle.SINGLE, size: 4, space: 6, color: "DDD8D0" } },
   children: [run(text, { size: 24, bold: true, color: C.stanza })],
@@ -195,6 +204,13 @@ function dataTable(headers, rows, weights) {
 
 // ---------- 組裝 ----------
 const K = [];
+const NUMERALS = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
+let sectionNo = 0;
+const numbered = (title) => `${NUMERALS[sectionNo++]}、${title}`;
+const verseLine = (label, v) => P([
+  run(label, { bold: true, size: 20, color: C.navy }),
+  run(v.text ? `「${v.text}」（${v.ref}）` : v.ref, { size: 20 }),
+], { before: 70, after: 70 });
 
 // 1. 標題橫幅
 K.push(new Table({
@@ -224,7 +240,7 @@ K.push(new Table({
 K.push(spacer(140));
 
 // 2. 歌詞（雙欄）
-K.push(SectionH(L.lyrics));
+K.push(SectionH(numbered(L.lyrics)));
 const ly = data.lyrics || [];
 const twoCol = ly.length >= 3;
 const half = twoCol ? Math.ceil(ly.length / 2) : ly.length;
@@ -262,38 +278,42 @@ K.push(card([
 ]));
 K.push(spacer(140));
 
-// 3-4. 作者簡介 ＋ 創作背景
+// 2-3. 作者簡介 ＋ 創作背景
 if (data.author_bio && data.author_bio.length) {
-  K.push(SectionH(data.author_line ? `${L.author}：${data.author_line}` : L.author));
+  K.push(SectionH(numbered(data.author_line ? `${L.author}：${data.author_line}` : L.author)));
   const inner = data.author_bio.map((p) => P(p));
   if (data.author_works) inner.push(Lab(L.works, data.author_works, { before: 150 }));
   K.push(card(inner));
   K.push(spacer(140));
 }
 if (data.background && data.background.length) {
-  K.push(SectionH(L.background));
+  K.push(SectionH(numbered(L.background)));
   K.push(card(data.background.map((p) => P(p))));
   K.push(spacer(140));
 }
 
-// 5. 詩歌簡述與樂感導引
+// 4. 詩歌簡述與樂感表達指導
 if (data.music) {
-  K.push(SectionH(L.music));
-  const inner = [];
-  if (data.music.intro) inner.push(Lab(L.musicIntro, data.music.intro));
-  if (data.music.guidance && data.music.guidance.length) {
-    inner.push(P([run(L.musicGuidance, { bold: true, color: C.navy })], { before: 190, after: 80 }));
-    data.music.guidance.forEach((g) => inner.push(
-      Lab(`・${g.stanza}：`, g.text, { indent: { left: 380, hanging: 220 } }),
-    ));
-  }
+  K.push(SectionH(numbered(L.music)));
+  const inner = [P([run(L.musicBackground, { bold: true, size: 22, color: C.navy })], { before: 0, after: 90 })];
+  if (data.music.intro) inner.push(P(data.music.intro));
+  (data.music.progress || []).forEach((g) => inner.push(
+    Lab(`${g.stanza}（${g.stage}）：`, g.text, { indent: { left: 380, hanging: 220 } }),
+  ));
+  inner.push(P([run(L.musicGuidance, { bold: true, size: 22, color: C.navy })], { before: 230, after: 90 }));
+  (data.music.guidance || []).forEach((g) => {
+    inner.push(P([run(g.stanza, { bold: true, size: 21, color: C.stanza })], { before: 150, after: 40 }));
+    inner.push(Lab(L.mood, g.mood));
+    inner.push(Lab(L.tempo, g.tempo));
+    inner.push(Lab(L.detail, g.detail));
+  });
   K.push(card(inner));
   K.push(spacer(140));
 }
 
-// 6. 詩節結構對照表
+// 5. 詩節結構對照表
 if (data.structure_table && data.structure_table.length) {
-  K.push(SectionH(L.structureH));
+  K.push(SectionH(numbered(L.structureH)));
   K.push(dataTable(
     [L.unitCol, L.experienceCol, L.versesCol],
     data.structure_table.map((r) => [r.stanza, r.experience, r.verses]),
@@ -302,82 +322,73 @@ if (data.structure_table && data.structure_table.length) {
   K.push(spacer(160));
 }
 
-// 7-9. 逐節解經 ＋ 啟示的話 ＋ 小組追求
-if (data.stanzas && data.stanzas.length) {
-  K.push(SectionH(L.exegesisH));
+const stanzas = data.stanzas || [];
 
-  data.stanzas.forEach((st) => {
+// 6. 逐節解經
+if (stanzas.length) {
+  K.push(SectionH(numbered(L.exegesisH)));
+  stanzas.forEach((st) => {
     K.push(StanzaH(`${st.no}：${st.title}`));
-
-    (st.phrases || []).forEach((ph) => {
-      const inner = [
-        P([run(ph.phrase, { bold: true, size: 21, color: C.navy })], { before: 0, after: 90 }),
-        Lab(L.explanation, ph.explanation),
-      ];
-      if (ph.verses) {
-        inner.push(new Paragraph({
-          spacing: { before: 150, after: 20, line: 280 },
-          indent: { left: 140, right: 120 },
-          shading: { type: ShadingType.CLEAR, fill: C.verseBg, color: "auto" },
-          border: {
-            left: { style: BorderStyle.SINGLE, size: 10, space: 8, color: C.verseBar },
-            top: { style: BorderStyle.SINGLE, size: 2, space: 6, color: C.verseBg },
-            bottom: { style: BorderStyle.SINGLE, size: 2, space: 6, color: C.verseBg },
-            right: { style: BorderStyle.SINGLE, size: 2, space: 6, color: C.verseBg },
-          },
-          children: [
-            run(L.crossReferences, { bold: true, size: 18, color: C.navy }),
-            run(ph.verses, { size: 18, color: C.verseTxt }),
-          ],
-        }));
-      }
-      K.push(card(inner, { bar: C.navyBar }));
+    (st.phrases || []).forEach((ph, i) => {
+      K.push(card([
+        P([run(`${i + 1}. 「${ph.phrase}」`, { bold: true, size: 21, color: C.navy })], { before: 0, after: 90 }),
+        verseLine(L.foundation, ph.foundation),
+        verseLine(L.application, ph.application),
+        Lab(L.explanation, ph.explanation, { before: 110 }),
+      ], { bar: C.navyBar }));
       K.push(spacer(110));
     });
-
-    if (st.revelation && st.revelation.length) {
-      const inner = [P([run(L.revelation, { bold: true, size: 20, color: C.stanza })], { before: 0, after: 90 })];
-      st.revelation.forEach((r) => inner.push(P(
-        [run("・", { color: C.revBar }),
-         run(r.source ? `${r.text}（${r.source}）` : r.text, { size: 18, color: "3F4348" })],
-        { before: 40, after: 40, line: 290, indent: { left: 200, hanging: 200 } },
-      )));
-      K.push(card(inner, { fill: C.revBg, edge: C.revEdge, bar: C.revBar }));
-      K.push(spacer(110));
-    }
-
-    if (st.group) {
-      const label = st.no.replace(/^第/, "").replace(/[節層段]$/, "");
-      const inner = [P([run(`${L.group}（${label}）`, { bold: true, size: 22, color: C.grpTitle })],
-        { before: 0, after: 130 })];
-      if (st.group.questions && st.group.questions.length) {
-        inner.push(P([run(L.questions, { bold: true, color: C.navy })], { after: 60 }));
-        st.group.questions.forEach((q, i) => inner.push(P(
-          `${i + 1}. ${q.hint ? `${q.q}（參考：${q.hint}）` : q.q}`,
-          { indent: { left: 460, hanging: 240 }, before: 50, after: 50 },
-        )));
-      }
-      if (st.group.practice) inner.push(Lab(L.practice, st.group.practice, { before: 150 }));
-      if (st.group.prayer) inner.push(Lab(L.prayer, st.group.prayer, { before: 110 }));
-      K.push(card(inner, { fill: C.grpBg, edge: C.grpEdge }));
-      K.push(spacer(190));
-    }
+    K.push(spacer(100));
   });
 }
 
-// 10. 對照總結表
+// 7. 啟示的話（精神歸納，非引文）
+if (stanzas.length) {
+  K.push(SectionH(numbered(L.revelationH)));
+  stanzas.forEach((st) => {
+    K.push(StanzaH(st.no));
+    const inner = (st.revelation || []).map((r) => P([
+      run(`${r.angle}（${r.author}）：`, { bold: true, size: 19, color: C.stanza }),
+      run(r.text, { size: 19, color: "3F4348" }),
+      run(`（${r.source}）`, { size: 17, color: C.verseTxt }),
+    ], { before: 70, after: 70, line: 290 }));
+    K.push(card(inner, { fill: C.revBg, edge: C.revEdge, bar: C.revBar }));
+    K.push(spacer(140));
+  });
+}
+
+// 8. 小組追求模組
+if (stanzas.length) {
+  K.push(SectionH(numbered(L.groupH)));
+  stanzas.forEach((st) => {
+    if (!st.group) return;
+    K.push(StanzaH(`【${st.no}小組追求模組】`));
+    const inner = [P([run(L.questions, { bold: true, size: 21, color: C.grpTitle })], { before: 0, after: 80 })];
+    st.group.questions.forEach((q, i) => {
+      inner.push(P([run(`${i + 1}. ${q.q}`, { bold: true })], { indent: { left: 460, hanging: 300 }, before: 90, after: 30 }));
+      inner.push(Lab(L.answer, q.answer, { indent: { left: 460 }, before: 20 }));
+    });
+    inner.push(P([run(L.practiceH, { bold: true, size: 21, color: C.grpTitle })], { before: 210, after: 60 }));
+    inner.push(Lab(L.practiceItem, st.group.practice.item));
+    inner.push(Lab(L.practiceSteps, st.group.practice.steps));
+    inner.push(P([run(L.prayerH, { bold: true, size: 21, color: C.grpTitle })], { before: 210, after: 60 }));
+    inner.push(P(st.group.prayer, { line: 320 }));
+    K.push(card(inner, { fill: C.grpBg, edge: C.grpEdge }));
+    K.push(spacer(190));
+  });
+}
+
+// 9. 對照總結表
 if (data.summary_table && data.summary_table.rows && data.summary_table.rows.length) {
-  K.push(SectionH(L.summary));
+  K.push(SectionH(numbered(L.summary)));
   K.push(dataTable(data.summary_table.headers, data.summary_table.rows));
   K.push(spacer(190));
 }
 
-// 11. 總結回應禱告
+// 10. 總結回應禱告
 if (data.closing_prayer && data.closing_prayer.length) {
-  K.push(card([
-    P([run(L.closingPrayer, { bold: true, size: 22, color: C.prayTitle })], { before: 0, after: 130 }),
-    ...data.closing_prayer.map((p) => P(p, { line: 320 })),
-  ], { fill: C.prayBg, edge: C.prayEdge }));
+  K.push(SectionH(numbered(L.closingPrayer)));
+  K.push(card(data.closing_prayer.map((p) => P(p, { line: 320 })), { fill: C.prayBg, edge: C.prayEdge }));
 }
 
 const doc = new Document({
