@@ -1,0 +1,19 @@
+{
+  "name": "hymn-spiritual-commentary",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Generate reviewed hymn study reports and downloadable Word documents.",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "docx": "^9.5.1",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0"
+  }
+}

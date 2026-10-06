@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#183654">
+    <meta name="description" content="将诗歌转化为可供小组使用的属灵深度解析与 Word 教材。">
+    <title>诗歌深度解析 · 小组研读</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="诗歌深度解析首页">
+        <span class="brand-mark" aria-hidden="true">✳</span>
+        <span>静读 <span class="brand-light">· SONG STUDY</span></span>
+      </a>
+      <div class="top-note"><span class="status-dot"></span> 小组研读工具</div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">A MORE THOUGHTFUL WAY TO SING</p>
+          <h1>让一首诗歌，<br><em>成为一段追求。</em></h1>
+          <p class="hero-text">从歌词出发，循着每一节的属灵脉络，预备一份可以带进小组的深度解析。</p>
+          <div class="hero-meta"><span>✦</span> 逐节解经 · 经文对照 · 小组应用</div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="sun-halo"></div>
+          <div class="cross-line cross-vertical"></div>
+          <div class="cross-line cross-horizontal"></div>
+          <div class="hill hill-back"></div>
+          <div class="hill hill-front"></div>
+          <div class="art-caption">默想 · 领受 · 回应</div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <div class="form-column">
+          <div class="section-kicker"><span>01</span> 开始探索</div>
+          <h2>这次要读哪一首？</h2>
+          <p class="section-intro">输入诗歌名称或诗集编号，再贴上你已核对、获准使用的歌词。</p>
+
+          <form id="hymn-form">
+            <label class="field-label" for="hymn-title">诗歌名称 / 诗集编号 <span>必填</span></label>
+            <div class="input-wrap">
+              <span class="input-icon" aria-hidden="true">⌕</span>
+              <input id="hymn-title" name="title" type="text" maxlength="200" placeholder="例如：生命诗歌 200 首" autocomplete="off" required>
+            </div>
+
+            <div class="field-row">
+              <label class="field-label" for="hymn-lyrics">已确认的歌词 <span>必填</span></label>
+              <span class="field-hint">按诗节分段，节与节之间空一行</span>
+            </div>
+            <textarea id="hymn-lyrics" name="lyrics" maxlength="30000" rows="10" placeholder="请粘贴你有权使用的歌词全文。&#10;&#10;第一节歌词……&#10;&#10;第二节歌词……" required></textarea>
+            <div class="lyrics-note">
+              <span class="note-icon" aria-hidden="true">i</span>
+              <p>诗歌编号并不一定对应同一首歌；为确保版本、分节与用字准确，系统不会自行抓取或补写歌词。请使用你已核对且有权使用的文本。歌词会发送至 Claude API 处理。</p>
+            </div>
+
+            <button class="button button-primary" type="submit" id="outline-button">
+              <span>生成解析骨架</span><span class="button-arrow" aria-hidden="true">↗</span>
+            </button>
+            <p id="form-error" class="error-message" role="alert" hidden></p>
+          </form>
+
+          <div class="workflow-note">
+            <div class="workflow-icon" aria-hidden="true">↳</div>
+            <p><strong>两步确认，让内容更可靠。</strong><br>先核对歌词与解析骨架，再生成完整报告；作者资料与经文内容仍建议人工复核。</p>
+          </div>
+        </div>
+
+        <aside class="guide-column">
+          <div class="guide-card">
+            <div class="guide-label">报告内容</div>
+            <h3>一份可以直接<br>带进小组的预备。</h3>
+            <div class="guide-divider"></div>
+            <ol class="module-list">
+              <li><span>01</span><div>作者与创作背景<small>源流 · 时代 · 作品</small></div></li>
+              <li><span>02</span><div>诗节结构与乐感<small>属灵进程 · 逐节引导</small></div></li>
+              <li><span>03</span><div>逐句解经与经文<small>片语 · 经文依据 · 属灵亮光</small></div></li>
+              <li><span>04</span><div>小组追求与回应<small>讨论 · 操练 · 祷告</small></div></li>
+            </ol>
+            <div class="guide-footer"><span>DOCX</span> 排版完成后即可下载、列印与分享</div>
+          </div>
+          <p class="privacy-note"><span aria-hidden="true">◇</span> 歌词仅用于本次生成请求，不会被保存到报告库。</p>
+        </aside>
+      </section>
+
+      <section id="review-section" class="review-section" hidden>
+        <div class="section-kicker"><span>02</span> 核对素材</div>
+        <h2>先确认歌词与解析方向</h2>
+        <p class="section-intro">请逐字核对歌词，并检查诗节主题与片语切分；确认后再撰写完整解析。</p>
+        <div id="lyrics-review" class="lyrics-review"></div>
+        <label class="confirm-row"><input id="confirm-lyrics" type="checkbox"><span>我已确认歌词及分节与使用版本一致。</span></label>
+        <div id="outline-review" class="outline-review"></div>
+        <label id="confirm-outline-row" class="confirm-row" hidden><input id="confirm-outline" type="checkbox"><span>我已确认以上属灵阶梯与片语切分。</span></label>
+        <div class="review-actions">
+          <button id="edit-button" class="button button-quiet" type="button">返回修改</button>
+          <button id="generate-button" class="button button-primary" type="button" disabled><span>确认并生成深度解析</span><span class="button-arrow" aria-hidden="true">↗</span></button>
+        </div>
+        <p id="review-error" class="error-message" role="alert" hidden></p>
+      </section>
+
+      <section id="report-section" class="report-section" hidden>
+        <div class="report-heading">
+          <div><div class="section-kicker"><span>03</span> 深度解析</div><h2 id="report-title"></h2><p id="report-subtitle" class="section-intro"></p></div>
+          <button id="download-button" class="button button-download" type="button"><span class="download-icon" aria-hidden="true">↓</span> 下载 Word</button>
+        </div>
+        <div id="report-content" class="report-content"></div>
+        <p class="review-disclaimer">生成内容是研读辅助材料，不取代经文核查与教会牧养；作者背景、引文归纳与经文出处请在使用前复核。</p>
+        <p id="download-error" class="error-message" role="alert" hidden></p>
+      </section>
+
+      <div id="loading-overlay" class="loading-overlay" hidden role="status" aria-live="polite">
+        <div class="loading-card"><div class="loader"></div><h3 id="loading-title">正在整理诗歌脉络</h3><p id="loading-message">这可能需要一点时间，请稍候。</p></div>
+      </div>
+    </main>
+
+    <footer><span>静读 · SONG STUDY</span><span>把熟悉的诗歌，读得更深一点。</span></footer>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
