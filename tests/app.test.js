@@ -98,7 +98,10 @@ test("generates an approved outline, complete report, and downloadable DOCX", as
       body: JSON.stringify(input),
     });
     assert.equal(outlineResponse.status, 200);
-    assert.deepEqual((await outlineResponse.json()).outline, outline);
+    const returnedOutline = (await outlineResponse.json()).outline;
+    assert.equal(returnedOutline.author_line, "作者不詳，資料待核");
+    assert.equal(returnedOutline.stanzas[0].title, "仰望並領受救恩");
+    assert.deepEqual(returnedOutline.stanzas[0].phrases, outline.stanzas[0].phrases);
 
     const unconfirmed = await fetch(`${baseUrl}/api/generate`, {
       method: "POST",
@@ -124,6 +127,9 @@ test("generates an approved outline, complete report, and downloadable DOCX", as
     assert.equal(generated.status, 200);
     const result = await generated.json();
     assert.deepEqual(result.report.lyrics, [{ no: "一", text: lyrics }]);
+    assert.equal(result.report.author_bio[0], "作者資料待核；請使用前核實詩集與可靠來源。");
+    assert.equal(result.report.stanzas[0].phrases[1].phrase, "主爱永长存。");
+    assert.equal(result.report.stanzas[0].phrases[1].explanation, "思想主愛的長久與信實。");
     assert.equal(result.report.labels.closingPrayer, "總結回應禱告");
 
     const download = await fetch(`${baseUrl}/api/download`, {
